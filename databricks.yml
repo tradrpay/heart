@@ -6,7 +6,6 @@ targets:
     mode: production
     workspace:
       host: https://dbc-1aea005d-b765.cloud.databricks.com
-      root_path: /Workspace/Users/lithaxanti11@gmail.com/.bundle/heart-disease-ml/prod
     resources:
       jobs:
         heart_disease_training:
@@ -15,6 +14,14 @@ targets:
             - task_key: train
               spark_python_task:
                 python_file: src/train.py
+              environment_key: default          
               libraries:
                 - pypi: { package: "scikit-learn==1.5.0" }
                 - pypi: { package: "xgboost==2.1.0" }
+          environments:
+            - environment_key: default
+              spec:
+                environment_version: "1"    
+                dependencies:
+                  - scikit-learn==1.5.0
+                  - xgboost==2.1.0
