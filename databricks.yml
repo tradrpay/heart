@@ -5,7 +5,7 @@ targets:
   prod:
     mode: production
     workspace:
-      host: https://your-workspace.cloud.databricks.com
+      host: https://dbc-1aea005d-b765.cloud.databricks.com
     resources:
       jobs:
         heart_disease_training:
