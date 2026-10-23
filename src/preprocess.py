@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import numpy as np
 from databricks.sdk.runtime import spark
@@ -22,6 +24,27 @@ TARGET_COL = "num"
 
 # Unity Catalog table that will hold engineered features + target
 FEATURES_TABLE = "heart_disease_catalog.ml_data.heart_features"
+
+
+def sanitize_feature_names(names):
+    """Convert sklearn-generated feature names into valid Delta column names."""
+    cleaned = []
+    seen = {}
+
+    for raw_name in names:
+        name = re.sub(r"[^A-Za-z0-9_]", "_", str(raw_name)).strip("_")
+        if not name:
+            name = "feature"
+
+        if name in seen:
+            seen[name] += 1
+            name = f"{name}_{seen[name]}"
+        else:
+            seen[name] = 0
+
+        cleaned.append(name)
+
+    return cleaned
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -118,7 +141,7 @@ def write_features_to_catalog(
     except Exception:
         feature_names = [f"f{i}" for i in range(X_transformed.shape[1])]
 
-        feature_names = [name.replace(" ", "_") for name in feature_names]
+    feature_names = sanitize_feature_names(feature_names)
 
     features_df = pd.DataFrame(
         X_transformed.toarray() if hasattr(X_transformed, "toarray") else X_transformed,
