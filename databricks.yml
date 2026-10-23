@@ -6,6 +6,7 @@ targets:
     mode: production
     workspace:
       host: https://dbc-1aea005d-b765.cloud.databricks.com
+      root_path: /Workspace/Users/lithaxanti11@gmail.com/.bundle/heart-disease-ml/prod
     resources:
       jobs:
         heart_disease_training:
@@ -14,8 +15,6 @@ targets:
             - task_key: train
               spark_python_task:
                 python_file: src/train.py
-              # No existing_cluster_id, no new_cluster, no job_cluster_key
-              # Serverless will be used automatically
               libraries:
                 - pypi: { package: "scikit-learn==1.5.0" }
                 - pypi: { package: "xgboost==2.1.0" }
