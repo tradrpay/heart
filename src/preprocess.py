@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from databricks.sdk.runtime import spark
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
@@ -117,6 +118,8 @@ def write_features_to_catalog(
     except Exception:
         feature_names = [f"f{i}" for i in range(X_transformed.shape[1])]
 
+        feature_names = [name.replace(" ", "_") for name in feature_names]
+
     features_df = pd.DataFrame(
         X_transformed.toarray() if hasattr(X_transformed, "toarray") else X_transformed,
         columns=feature_names,
@@ -124,6 +127,6 @@ def write_features_to_catalog(
     features_df["target"] = y.values
 
     sdf = spark.createDataFrame(features_df)
-    sdf.write.mode("overwrite").saveAsTable(table_name)
+    sdf.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(table_name)
     print(f"[preprocess] Features written to {table_name} "
           f"({features_df.shape[0]} rows, {features_df.shape[1]} cols)")

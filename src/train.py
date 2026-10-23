@@ -16,6 +16,7 @@ import tempfile
 import matplotlib.pyplot as plt
 import mlflow
 import mlflow.xgboost
+from mlflow.models import infer_signature
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -209,21 +210,15 @@ def main():
 
         # --- register model in Unity Catalog ---
         print("[5/5] Registering model in Unity Catalog...")
+        xgb_clf = model.named_steps["clf"]
+        X_test_pre = model.named_steps["pre"].transform(X_test)
+        model_signature = infer_signature(X_test_pre, xgb_clf.predict(X_test_pre))
         mlflow.xgboost.log_model(
-            xgb_model=model.named_steps["clf"],
+            xgb_model=xgb_clf,
             artifact_path="model",
             registered_model_name=REGISTERED_MODEL_NAME,
+            signature=model_signature,
         )
-        # NOTE: the registered model above contains only the XGBoost
-        # estimator. The full preprocessing Pipeline is logged below so
-        # that inference can be reproduced end-to-end.
-        mlflow.sklearn.log_model(
-            sk_model=model,
-            artifact_path="pipeline",
-        )
-
-        print(f"      run_id = {run.info.run_id}")
-        print(f"      registered model = {REGISTERED_MODEL_NAME}")
 
 
 if __name__ == "__main__":
