@@ -22,11 +22,6 @@ targets:
               spark_python_task:
                 python_file: src/train.py
               environment_key: default
-              libraries:
-                - pypi:
-                    package: "scikit-learn==1.5.0"
-                - pypi:
-                    package: "xgboost==2.1.0"
           environments:
             - environment_key: default
               spec:
