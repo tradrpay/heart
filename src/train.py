@@ -34,7 +34,7 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test
 from sklearn.pipeline import Pipeline
 from xgboost import XGBClassifier
 
-from src.preprocess import (
+from preprocess import (
     clean_data,
     prepare_features,
     write_features_to_catalog,
